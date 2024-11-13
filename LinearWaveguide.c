@@ -1,5 +1,5 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
-//%%%%%%%%%%%%%%%%%%%% Circular Waveguide %%%%%%%%%%%%%%%%%%//
+//%%%%%%%%%%%%%%%%%%%%%% Linear Waveguide %%%%%%%%%%%%%%%%%%//
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
 //%%%%%%%%%%%% Elaborado por: Igor Beder Burti R. %%%%%%%%%%//
 //%%%%%%%%%%%%%% Última modificação: 06/06/2024 %%%%%%%%%%%%//
@@ -15,18 +15,17 @@ int main(){
 
     FILE *fidelidade20, *fidelidade3, *fidelidade4, *fidelidade5, *fidelidade6;
     FILE *fidelidadeN00N121920, *fidelidadeN00N45, *fidelidadeN00N56, *fidelidadeN00N35;
-    FILE *squeeze2p, *squeeze2q;
     FILE *numeromedio1, *numeromedio20;
     int i, l, k, n;
 
-    n = 20;
+    n = 20; // Numero de guias de onda
 
     double _Complex A[n+1][n+1];
     double J[n+1], J0, F20, F3, F4, F5, F6, FN56, FN34, FN45, FN35, s2, q2;
     double N1, N20;
     double _Complex k1A[n+1], k2A[n+1], k3A[n+1], k4A[n+1];
     double _Complex ic, x1;
-    double t, tmax, dt, r, phi;
+    double t, tmax, dt;
 
     //fidelidade20 = fopen("fidelidade20.dat", "w");
     //fidelidade3 = fopen("fidelidade3.dat", "w");
@@ -37,22 +36,19 @@ int main(){
     //fidelidadeN00N45 = fopen("fidelidadeN00N45.dat", "w");
     //fidelidadeN00N56 = fopen("fidelidadeN00N56.dat", "w");
     //fidelidadeN00N35 = fopen("fidelidadeN00N35.dat", "w");
-    //squeeze2p = fopen("squeeze3p.dat", "w");
-    //squeeze2q = fopen("squeeze3q.dat", "w");
     numeromedio1 = fopen("NumeroMedio1_N20_N00N.dat", "w");
     //numeromedio20 = fopen("NumeroMedio20.dat", "w");
 
-    ic = -1.0*I + 0.0;
+    ic = -1.0*I + 0.0; // Defini ic = -i
     J0 = 1.0;
 
-    for (i = 1; i <= n; i++){
+    for (i = 1; i <= n; i++){ //Parametros de acoplamento
 
-        J[i] = J0*sqrt(i*(n-i));
-        //J[i] = cos(M_PI + i)*cos(M_PI + i);
-        //J[i] = 1.0;
+        J[i] = J0*sqrt(i*(n-i)); // J = J0\sqrt(j*(N-j))
+
     }
 
-    for (i = 1; i <= n; i++){ // Condição inicial 
+    for (i = 1; i <= n; i++){ // Condição inicial para os operadores
 
         for(k = 1; k <= n; k++){
             
@@ -68,9 +64,9 @@ int main(){
 
     }
 
-    dt = (2* M_PI)/999.0;
-    dt = 0.001;
-    tmax = 2* M_PI;
+    dt = (2* M_PI)/999.0; // Discretização
+    //dt = 0.001;
+    tmax = 2* M_PI; // Tempo máximo do grafico
     //tmax = 100.0;
     for (t = dt; t <= tmax; t = t + dt){
 
@@ -135,22 +131,21 @@ int main(){
 
         }
         /* Calculo do número médio de fótons no waveguide j: N_j = n*|A_{ij}|^2*/
-
+        /* Fidelidade entre os guias i e j: F_{ij} (z) = |A_{ij}^n|^2*/
+        
         // %%%%%%% Estado Fock %%%%%%% //
 
-        //N1 = pow(cabs(A[1][1]), 2.0); //
-        //N20 = 2.0*pow(cabs(A[1][20]), 2.0);
+        //N1 = pow(cabs(A[1][1]), 2.0); // Numero medio de fótons no guia 1 
+        //N20 = 2.0*pow(cabs(A[1][20]), 2.0); // Numero medio de fótons no guia 20
         //x1 = A[1][20]*A[1][20];
-        //F20 = pow(cabs(x1), 2.0);
-        //F5 = pow(cabs(A[1][5]), 2.0);
-        //F6 = pow(cabs(A[1][6]), 2.0);
+        //F20 = pow(cabs(x1), 2.0); // Fidelidade entre os guias 1 e 20
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%% //
 
         // %%%%%%% Estado N00N %%%%%%% //
 
         x1 = A[1][19]*A[1][19] + A[1][20]*A[1][20] + A[2][19]*A[2][19] + A[2][20]*A[2][20];
-        FN34 = 0.25*cabs(x1)*cabs(x1);
+        FN34 = 0.25*cabs(x1)*cabs(x1); // Fidelidade entre os guias 1-2 e 19-20
         N1 = pow(cabs(A[1][1] + A[2][1]), 2.0);
         //x1 = A[4][1]*A[4][1] + A[4][2]*A[4][2] + A[5][1]*A[5][1] + A[5][2]*A[5][2];
         //FN45 =  0.25*cabs(x1)*cabs(x1);
@@ -163,15 +158,6 @@ int main(){
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%% //
 
-        // %%%%%%% Estado Squeeze %%%%%%% //
-        //r = 0.7;
-        //phi = M_PI;
-
-        //x1 = A[2][1]*A[2][1]*exp(I*phi);
-        //s2 = cabs(A[2][1])*cabs(A[2][1])*sinh(r)*sinh(r) + 0.25*sinh(2*r)*(x1 + conj(x1));
-        //q2 = cabs(A[2][1])*cabs(A[2][1])*sinh(r)*sinh(r) - 0.25*sinh(2*r)*(x1 + conj(x1));
-
-
     //fprintf(fidelidade20, "%.8g %.8g\n", t, F20);
     //fprintf(fidelidade3, "%.8g %.8g\n", t, F3);
     //fprintf(fidelidade4, "%.8g %.8g\n", t, F4);
@@ -181,8 +167,6 @@ int main(){
     //fprintf(fidelidadeN00N45, "%.8g %.8g\n", t, FN45);
     //fprintf(fidelidadeN00N35, "%.8g %.8g\n", t, FN35);
     //fprintf(fidelidadeN00N56, "%.8g %.8g\n", t, FN56);
-    //fprintf(squeeze2p, "%.8g %.8g\n", t, s2);
-    //fprintf(squeeze2q, "%.8g %.8g\n", t, q2);
     fprintf(numeromedio1, "%.8g %.8g\n", t, N1);
     //fprintf(numeromedio20, "%.8g %.8g\n", t, N20);
 
